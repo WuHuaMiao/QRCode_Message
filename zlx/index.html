@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+</head>
+<body>
+
+<form id="contentForm">
+    <label for="contentInput">Content:</label>
+    <input id="contentInput"  name="contentInput" type="text">
+
+    <label for="val2">test2</label>
+    <input id="val2" type="text"/>
+    <input type="submit" value="submit"/>
+</form>
+
+<form id="testForm">
+    <div><input type="text" name="a" value="1" id="a"></div>
+    <div><input type="text" name="b" value="2" id="b"></div>
+    <div><input type="hidden" name="c" value="3" id="c"></div>
+    <div>
+        <textarea name="d" rows="8" cols="40">4</textarea>
+    </div>
+    <div><select name="e">
+        <option value="5" selected="selected">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+    </select></div>
+    <div>
+        <input type="checkbox" name="f" value="8" id="f">
+    </div>
+    <div>
+        <input type="submit" name="g" value="Submit" id="g">
+    </div>
+</form>
+
+
+<div id="qrcode"/>
+
+<script type="text/javascript" src="jquery-3.1.0.min.js"></script>
+<script type="text/javascript" src="qrcode.min.js"></script>
+
+<script>
+
+    $('#contentForm').submit(function(e) {
+        console.log('test');
+
+        var btn = $('#contentInputButton');
+        var input = $('#contentInput').val();
+        var href = window.location.href;
+        new QRCode(document.getElementById('qrcode'), {
+            text: encodeURI(href + 'www.baidu.com' + '#{"message": "' + input)
+        });
+        var jsonData = $('#contentForm').serializeArray();
+        console.log(jsonData);
+        return false;
+    });
+
+    $('#testForm').submit(function(e) {
+        d = {};
+        var se = $(this).serializeArray();
+        console.log(se);
+        $.each(se, function() {
+            d[this.name] = this.value;
+        });
+        console.log(JSON.stringify(d));
+        return false;
+    });
+
+</script>
+
+</body>
+</html>
