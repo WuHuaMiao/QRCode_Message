@@ -184,12 +184,37 @@
         }
     }
 
+    function Show(canvas, width, height, display) {
+        this.canvas = typeof canvas == 'object' ? canvas : document.getElementById(canvas);
+        this.display = typeof display == 'object' ? display : document.getElementById(display);
+        this.ctx = this.canvas.getContext('2d');
+
+
+        this.width = this.canvas.width = width / 2;
+        this.height = this.canvas.height = height;
+
+        this.currentColor = 'rgb(255,0,0)';
+    }
+    Show.prototype = {
+        constructor: Show,
+
+        drawColor: function(color) {
+            this.ctx.fillStyle = this.currentColor = color;
+            console.log(this.ctx.fillStyle)
+            this.ctx.fillRect(0, 0, this.width, this.height);
+
+            if(this.display)
+                this.display.innerHTML = this.currentColor;
+        }
+    }
+
 
     function ColorPicker(mainCanvas, subCanvas, thirdCanvas, forthCanvas, display) {
         this.main = new Main(mainCanvas);
         var data = this.main.returnData();
         this.sub = new Sub(subCanvas, data.currentColor, data.width, data.height, 'brightness');
         this.third = new Sub(thirdCanvas, data.currentColor, data.width, data.height, 'saturation');
+        this.show = new Show(forthCanvas, data.width, data.height, display);
 
         this.bindCanvasAction();
 
@@ -213,7 +238,6 @@
 
             this.sub.outsideClickAction = function() {
                 this.third.drawColorBlock(this.sub.currentColor);
-                console.log(this.sub.currentColor)
             }.bind(this);
 
             this.third.outsideClickAction = function() {
@@ -235,6 +259,7 @@
             canvas.addEventListener('click', function() {
                 this.clickAction();
                 _this.mark.call(this);
+                _this.show.drawColor(_this.third.currentColor);
             }.bind(obj));
         },
 
@@ -244,5 +269,5 @@
             this.ctx.fillRect(this.x-width/2, 0, width, this.height);
         },
     }
-    new ColorPicker('color_canvas_main', 'color_canvas_sub', 'color_canvas_third', '');
+    new ColorPicker('color_canvas_main', 'color_canvas_sub', 'color_canvas_third', 'selected_color', 'color_value');
 })()
