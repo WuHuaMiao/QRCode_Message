@@ -2,8 +2,8 @@
 
 ;(function() {
    
-    function Main(canvas) {
-        this.STEP = 7; 
+    function Main(canvas, length) {
+        this.STEP = length || 7; 
         this.RANGE = 255 * 6 / this.STEP;
 
         this.canvas = typeof canvas == 'object' ? canvas : document.getElementById(canvas);
@@ -142,7 +142,7 @@
                 rgb = this.ctx.fillStyle= 'rgb('+r+','+g+','+b+')';
                 this.ctx.fillRect(i, 0, 1,this.height);
             }
-            this.currentColor
+            //this.currentColor
         },
 
         getCurrentColor: function() {
@@ -189,18 +189,18 @@
         this.display = typeof display == 'object' ? display : document.getElementById(display);
         this.ctx = this.canvas.getContext('2d');
 
-
         this.width = this.canvas.width = width / 2;
         this.height = this.canvas.height = height;
 
-        this.currentColor = 'rgb(255,0,0)';
+        this.currentColor = 'rgb(255, 0, 0)';
+
+        this.drawColor(this.currentColor)
     }
     Show.prototype = {
         constructor: Show,
 
         drawColor: function(color) {
             this.ctx.fillStyle = this.currentColor = color;
-            console.log(this.ctx.fillStyle)
             this.ctx.fillRect(0, 0, this.width, this.height);
 
             if(this.display)
@@ -209,12 +209,13 @@
     }
 
 
-    function ColorPicker(mainCanvas, subCanvas, thirdCanvas, forthCanvas, display) {
-        this.main = new Main(mainCanvas);
+    function ColorPicker(mainCanvas, subCanvas, thirdCanvas, forthCanvas, display, length) {
+        this.main = new Main(mainCanvas, length);
         var data = this.main.returnData();
         this.sub = new Sub(subCanvas, data.currentColor, data.width, data.height, 'brightness');
         this.third = new Sub(thirdCanvas, data.currentColor, data.width, data.height, 'saturation');
         this.show = new Show(forthCanvas, data.width, data.height, display);
+        this.currentColor = data.currentColor;
 
         this.bindCanvasAction();
 
@@ -231,17 +232,12 @@
             }
 
             this.main.outsideClickAction = function() {
-                this.sub.drawColorBlock(this.main.currentColor); 
-                this.sub.currentColor = this.main.currentColor;
-                this.third.drawColorBlock(this.sub.currentColor);
+                this.sub.drawColorBlock(this.sub.currentColor = this.main.currentColor); 
+                this.third.drawColorBlock(this.third.currentColor = this.sub.currentColor);
             }.bind(this);
 
             this.sub.outsideClickAction = function() {
-                this.third.drawColorBlock(this.sub.currentColor);
-            }.bind(this);
-
-            this.third.outsideClickAction = function() {
-                console.log(this.third.currentColor)
+                this.third.drawColorBlock(this.third.currentColor = this.sub.currentColor);
             }.bind(this);
         },
 
@@ -259,7 +255,7 @@
             canvas.addEventListener('click', function() {
                 this.clickAction();
                 _this.mark.call(this);
-                _this.show.drawColor(_this.third.currentColor);
+                _this.show.drawColor(_this.currentColor = _this.third.currentColor);
             }.bind(obj));
         },
 
@@ -268,6 +264,13 @@
             this.ctx.fillStyle = '#000';
             this.ctx.fillRect(this.x-width/2, 0, width, this.height);
         },
+
+        getCurrentColor: function() {
+            return this.currentColor;
+        }
     }
-    new ColorPicker('color_canvas_main', 'color_canvas_sub', 'color_canvas_third', 'selected_color', 'color_value');
+
+    window.ColorPicker = ColorPicker;
 })()
+
+
