@@ -24,9 +24,26 @@
     <script type="text/javascript" src="./color_picker.js"></script>
     <script type="text/javascript">
 ;(function() {
-    //参数：色相canvas，明度canvas，饱和度canvas，被选择的颜色canvas，显示颜色值的区域, 选择器长度。
-    //前五个参数为id或对象均可。最后一个参数是可选的，且数字越大选择器越短，默认为7。
-    var myColorPicker = new ColorPicker('color_canvas_main', 'color_canvas_sub', 'color_canvas_third', 'selected_color', 'color_value', 8);
+    //参数：
+    //{
+    //    hueCanvas: 色相canvas，
+    //    brightnessCanvas: 明度canvas， 
+    //    saturationCanvas: 饱和度canvas，
+    //    selectedCanvas: 被选择的颜色canvas， 
+    //    display: 显示颜色值的区域，
+    //    length: 选择器色带长度，
+    //    defaultColor: 默认颜色
+    //}
+    //前五个参数为id或对象均可。最后两个参数是可选的，length数字越大选择器越短，默认为7；defaultColor默认为黑色。
+    var myColorPicker = new ColorPicker({
+        hueCanvas: 'color_canvas_main',
+        brightnessCanvas: 'color_canvas_sub',
+        saturationCanvas: 'color_canvas_third',
+        selectedCanvas: 'selected_color',
+        display: 'color_value',
+        length: 8,
+        defaultColor: 'rgb(255, 255, 255)',
+    });
     //获取当前被选中颜色的方法：.getCurrentColor()，返回类型为字符串
     console.log(myColorPicker.getCurrentColor());
 })()

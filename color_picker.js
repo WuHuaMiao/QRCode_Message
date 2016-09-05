@@ -2,19 +2,20 @@
 
 ;(function() {
    
-    function Main(canvas, length) {
-        this.STEP = length || 7; 
-        this.RANGE = 255 * 6 / this.STEP;
+    //色相
+    function Main(canvas, config) {
+        this.STEP = config.length || 7; //颜色的步长，用以控制取色器色带的长度
+        this.RANGE = 255 * 6 / this.STEP; //由于色相有6个变化过程（红到黄，黄到绿，绿到青，青到蓝，蓝到紫，紫到红），所以总长度是 255×6/步长
 
         this.canvas = typeof canvas == 'object' ? canvas : document.getElementById(canvas);
         this.ctx = this.canvas.getContext('2d');
-        this.outsideClickAction = function() {};
+        this.outsideClickAction = function() {}; //不属于该类所控制的点击事件，先将它设为空函数
 
         /* init */
         this.width = this.canvas.width = this.RANGE;
         this.height = this.canvas.height = 15;
-        this.x = 0;
-        this.currentColor = 'rgb(255, 0, 0)';
+        this.x = 0; //鼠标在该canvas上点击位置的横坐标，用以计算颜色值
+        this.currentColor = config.default || 'rgb(0, 0, 0)'; //储存当前颜色，初始值为用户未选择颜色时的默认值，该默认值允许自行设定
 
         this.drawColorBlock();
     }
@@ -22,8 +23,9 @@
     Main.prototype = {
         constructor: Main,
 
+        //绘制色带
         drawColorBlock: function() {
-            var pWidth = 1,
+            var pWidth = 1, //每个颜色的绘制宽度
                 RANGE = this.RANGE;
             for(var i=0; i<RANGE; i++) {
                 this.ctx.fillStyle = this.getStyle(i);
@@ -31,6 +33,7 @@
             }
         },
 
+        //获取色带背景颜色
         getStyle: function (i) {
             var STEP = this.STEP,
                 RANGE = 255 / STEP;
@@ -184,7 +187,7 @@
         }
     }
 
-    function Show(canvas, width, height, display) {
+    function Show(canvas, currentColor, width, height, display) {
         this.canvas = typeof canvas == 'object' ? canvas : document.getElementById(canvas);
         this.display = typeof display == 'object' ? display : document.getElementById(display);
         this.ctx = this.canvas.getContext('2d');
@@ -192,7 +195,7 @@
         this.width = this.canvas.width = width / 2;
         this.height = this.canvas.height = height;
 
-        this.currentColor = 'rgb(255, 0, 0)';
+        this.currentColor = currentColor;
 
         this.drawColor(this.currentColor)
     }
@@ -208,13 +211,15 @@
         }
     }
 
-
-    function ColorPicker(mainCanvas, subCanvas, thirdCanvas, forthCanvas, display, length) {
-        this.main = new Main(mainCanvas, length);
+    function ColorPicker(config) {
+        this.main = new Main(config.hueCanvas, {
+            length: config.length,
+            default: config.defaultColor
+        });
         var data = this.main.returnData();
-        this.sub = new Sub(subCanvas, data.currentColor, data.width, data.height, 'brightness');
-        this.third = new Sub(thirdCanvas, data.currentColor, data.width, data.height, 'saturation');
-        this.show = new Show(forthCanvas, data.width, data.height, display);
+        this.sub = new Sub(config.brightnessCanvas, data.currentColor, data.width, data.height, 'brightness');
+        this.third = new Sub(config.saturationCanvas, data.currentColor, data.width, data.height, 'saturation');
+        this.show = new Show(config.selectedCanvas, data.currentColor, data.width, data.height, config.display);
         this.currentColor = data.currentColor;
 
         this.bindCanvasAction();
